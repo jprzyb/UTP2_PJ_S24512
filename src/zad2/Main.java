@@ -14,7 +14,16 @@ public class Main {
     System.out.println(purch);
 
     // --- tu należy dodać odpowiedni kod
-
+      purch.addPropertyChangeListener(evt -> {
+          System.out.println(evt.getPropertyName() + " change to: " + evt.getNewValue());
+          if ("price".equals(evt.getPropertyName())) {
+              Double newValue = (Double) evt.getNewValue();
+              if (newValue < 1000) {
+                  System.out.println("Price change to: " + newValue + " not allowed");
+              }
+          }
+      });
+      System.out.println("beeep beeep");
     // ----------------------------------
 
     try {
