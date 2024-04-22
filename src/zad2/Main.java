@@ -7,6 +7,8 @@
 package zad2;
 
 
+import java.beans.PropertyVetoException;
+
 public class Main {
   public static void main(String[] args) {
 
@@ -14,16 +16,21 @@ public class Main {
     System.out.println(purch);
 
     // --- tu należy dodać odpowiedni kod
-      purch.addPropertyChangeListener(evt -> {
-          System.out.println(evt.getPropertyName() + " change to: " + evt.getNewValue());
-          if ("price".equals(evt.getPropertyName())) {
-              Double newValue = (Double) evt.getNewValue();
-              if (newValue < 1000) {
-                  System.out.println("Price change to: " + newValue + " not allowed");
-              }
-          }
-      });
-      System.out.println("beeep beeep");
+    purch.addPropertyChangeListener(evt -> {
+      if (!evt.getNewValue().equals(evt.getOldValue())) {
+        System.out.printf("Change value of: %s from: %s to: %s\n",
+                evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+      }
+    });
+
+    purch.addVetoableChangeListener(evt -> {
+      if (evt.getPropertyName().equals("price")) {
+        Double doubleValue = Double.valueOf(evt.getNewValue().toString());
+        if (doubleValue < 1000) {
+          throw new PropertyVetoException("Price change to: " + doubleValue + " not allowed", evt);
+        }
+      }
+    });
     // ----------------------------------
 
     try {

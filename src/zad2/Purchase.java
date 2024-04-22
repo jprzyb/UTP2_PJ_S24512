@@ -1,11 +1,16 @@
 package zad2;
 
 import java.beans.*;
+import java.beans.PropertyVetoException;
 
 public class Purchase {
+
     private String prod;
     private String data;
     private Double price;
+
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private VetoableChangeSupport vetoableChangeSupport = new VetoableChangeSupport(this);
 
     public Purchase(String prod, String data, Double price) {
         this.prod = prod;
@@ -26,35 +31,40 @@ public class Purchase {
     }
 
     public void setData(String data) {
-        String oldValue = this.data;
+        String oldData = this.data;
         this.data = data;
-        System.out.println("Change value of: data from: " + oldValue + " to: " + data);
+        propertyChangeSupport.firePropertyChange("data", oldData, data);
     }
 
     public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) throws PropertyVetoException {
-        Double oldValue = this.price;
-        if (price < 1000) {
-           new PropertyVetoException("Price change to: " + price + " not allowed");
-        }
-        this.price = price;
-        System.out.println("Change value of: price from: " + oldValue + " to: " + price);
-    }
-
+    @Override
     public String toString() {
-        return "Purchase [prod=" + prod + ", data=" + data + ", price=" + price + "]";
+        return "Purchase [prod=" + this.prod + ", data=" + this.data + ", price=" + this.price + "]";
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
+    public void setPrice(Double price) throws PropertyVetoException {
+        Double oldPrice = this.price;
+        vetoableChangeSupport.fireVetoableChange("price", oldPrice, price);
+        this.price = price;
+        propertyChangeSupport.firePropertyChange("price", oldPrice, price);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
+    public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
     }
 
-    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    public void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+    }
+
+    public void addVetoableChangeListener(VetoableChangeListener vetoableChangeListener) {
+        vetoableChangeSupport.addVetoableChangeListener(vetoableChangeListener);
+    }
+
+    public void removeVetoableChangeListener(VetoableChangeListener vetoableChangeListener) {
+        vetoableChangeSupport.removeVetoableChangeListener(vetoableChangeListener);
+    }
 }
